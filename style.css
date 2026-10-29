@@ -1,0 +1,1833 @@
+/* =====================================================================
+   BLYNKnBILL - style.css
+   1.  Colours (theme variables)
+   2.  Page basics and layout
+   3.  Text, form controls and buttons
+   4.  Item rows
+   5.  Saved bills list
+   6.  Dropdown suggestions and toast message
+   7.  Small helper classes
+   8.  Live preview panel
+   9.  Bill of Supply sheet
+   10. GST Tax Invoice sheet
+   11. Print rules
+   ===================================================================== */
+
+
+/* ---------------------------------------------------------------------
+   1. COLOURS - change these to re-skin the whole app
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  box-sizing: border-box;
+
+  /* keeps content clear of phone notches and system bars */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  --bg:  #eef0ee;   /* page background        */
+  --card: #ffffff;  /* card background        */
+  --tx:  #17201b;   /* main text              */
+  --mut: #5d6a62;   /* grey helper text       */
+  --bd:  #cfd6d1;   /* borders                */
+  --ac:  #0f5c3a;   /* accent (green buttons) */
+  --act: #ffffff;   /* text on accent colour  */
+}
+
+
+/* ---------------------------------------------------------------------
+   2. PAGE BASICS AND LAYOUT
+   --------------------------------------------------------------------- */
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Mobile first: one column (form on top, bill below) */
+#app {
+  display: grid;
+  grid-template-columns: minmax(320px, 430px) 1fr;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  #app {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+}
+
+/* Desktop: two equal halves, form on the left, bill on the right */
+@media (min-width: 861px) {
+  #app {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    max-width: none;
+    margin: 0;
+    align-items: start;
+  }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+
+/* ---------------------------------------------------------------------
+   3. TEXT, FORM CONTROLS AND BUTTONS
+   --------------------------------------------------------------------- */
+h1 {
+  font-size: 19px;
+  margin: 0 0 10px;
+}
+
+h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--mut);
+  margin-bottom: 3px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--tx);
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: 7px;
+  padding: 8px;
+}
+
+/* visible outline when a field or button is selected with the keyboard */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid var(--ac);
+  outline-offset: 1px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  border-radius: 7px;
+  padding: 8px 12px;
+}
+
+/* "p" = primary button (green) */
+button.p {
+  background: var(--ac);
+  color: var(--act);
+  border-color: var(--ac);
+  font-weight: 600;
+}
+
+/* two fields side by side */
+.g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* one form field (label + input) */
+.f {
+  margin-bottom: 10px;
+}
+
+/* a row of buttons that wraps on small screens */
+.btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* small grey helper text */
+.pg {
+  font-size: 12px;
+  color: var(--mut);
+  padding: 4px 0;
+}
+
+/* big total at the bottom of the items card */
+.tot {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+
+/* ---------------------------------------------------------------------
+   4. ITEM ROWS (one block per product)
+   --------------------------------------------------------------------- */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 8px;
+  border-top: 1px solid var(--bd);
+  padding: 10px 0;
+}
+
+/* first line of a row: number, product name, remove button */
+.row .top {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.row .top .dd {
+  flex: 1;
+  min-width: 0;
+}
+
+.row .no {
+  flex: none;
+  width: 22px;
+  color: var(--mut);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.row .x {
+  flex: none;
+  width: 38px;
+  padding: 7px 0;
+  line-height: 1;
+  font-size: 18px;
+}
+
+.row label {
+  margin-bottom: 2px;
+}
+
+/* last line of a row: "Save product" button on the left, amount on the right */
+.row .ab {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.row .sp2 {
+  flex: none;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ac);
+  border-color: var(--ac);
+}
+
+.row .amt {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* small round buttons used for custom units */
+.chip {
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  font-size: 12px;
+}
+
+/* saved product "pills" with a delete button inside */
+.pchip {
+  display: inline-flex;
+  margin: 2px 4px 2px 0;
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.pchip button {
+  border: 0;
+  border-radius: 0;
+  padding: 3px 9px;
+  font-size: 12px;
+}
+
+
+/* ---------------------------------------------------------------------
+   5. SAVED BILLS LIST
+   --------------------------------------------------------------------- */
+.bl {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.bi {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--bd);
+  padding: 8px 2px;
+  cursor: pointer;
+}
+
+.bi:hover {
+  background: var(--bg);
+}
+
+.bo {
+  flex: 1;
+  min-width: 0;
+}
+
+.bo small {
+  display: block;
+  color: var(--mut);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bd {
+  flex: none;
+  padding: 4px 10px;
+}
+
+
+/* ---------------------------------------------------------------------
+   6. DROPDOWN SUGGESTIONS AND TOAST MESSAGE
+   --------------------------------------------------------------------- */
+
+/* wrapper that lets the dropdown sit just under its input */
+.dd {
+  position: relative;
+}
+
+.dl {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.dl[hidden] {
+  display: none;
+}
+
+.dl div {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bd);
+}
+
+.dl div:last-child {
+  border-bottom: 0;
+}
+
+.dl div:hover {
+  background: var(--bg);
+}
+
+.dl small {
+  display: block;
+  color: var(--mut);
+}
+
+/* "No saved ..." message */
+.dl .em {
+  color: var(--mut);
+  cursor: default;
+}
+
+/* dropdown line with a delete (x) button on the right */
+.dl .ri {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dl .ri > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.dl .dx {
+  flex: none;
+  padding: 2px 9px;
+  font-size: 13px;
+}
+
+/* pop-up message at the bottom of the screen */
+#toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ac);
+  color: var(--act);
+  padding: 8px 14px;
+  border-radius: 8px;
+  z-index: 20;
+  font-size: 14px;
+}
+
+#toast[hidden] {
+  display: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   7. SMALL HELPER CLASSES (used instead of inline styles in the HTML)
+   --------------------------------------------------------------------- */
+.mt-8  { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-14 { margin-top: 14px; }
+.mb-10 { margin-bottom: 10px; }
+
+.full-width {
+  width: 100%;
+}
+
+/* red warning text under the company box */
+.error-note {
+  color: #d9534f;
+  font-weight: 600;
+}
+
+/* tick box with its text on one line */
+.check-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--tx);
+  margin-bottom: 10px;
+}
+
+.check-label input {
+  width: auto;
+}
+
+/* "Add your own unit" text box next to its button */
+.unit-input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+/* gap between the "copies to print" tick boxes */
+#cps {
+  gap: 6px 14px;
+}
+
+/* GST-only fields are hidden when the company uses Bill of Supply */
+.nogst .gstf {
+  display: none !important;
+}
+
+
+/* ---------------------------------------------------------------------
+   8. LIVE PREVIEW PANEL
+   --------------------------------------------------------------------- */
+#preview {
+  min-width: 0;
+}
+
+/* on desktop the preview stays in view while the form scrolls */
+@media (min-width: 861px) {
+  #preview {
+    position: sticky;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+  }
+}
+
+#sheets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* only used while printing */
+#printArea {
+  display: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   9. BILL OF SUPPLY SHEET (140mm x 196mm, always black text on white)
+   --------------------------------------------------------------------- */
+.bill {
+  width: 140mm;
+  height: 196mm;
+  background: #fff;
+  color: #000;
+  border: 1px solid #444;
+  padding: 3mm 4mm;
+  font: 8pt/1.35 Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow: hidden;
+  flex: none;
+}
+
+/* "t" = a line with text at the left and right ends */
+.bill .t {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bill .c {
+  text-align: center;
+}
+
+.bill .nmx {
+  font-size: 16pt;
+  margin: 1mm 0;
+  text-align: center;
+}
+
+.bill .sm {
+  font-size: 7pt;
+}
+
+/* items table */
+.bill table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 3mm;
+}
+
+.bill td,
+.bill th {
+  border: 0;
+  border-left: 1px solid #000;
+  padding: 0 1mm;
+  height: 4.9mm;
+  text-align: center;
+  font-size: 7.5pt;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.bill td:first-child,
+.bill th:first-child {
+  border-left: 0;
+}
+
+.bill th {
+  font-weight: 700;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.bill td.l {
+  text-align: left;
+}
+
+/* the TOTAL row */
+.bill td.r {
+  text-align: right;
+  font-weight: 700;
+  border-top: 1px solid #000;
+}
+
+/* "Total amount (in words)" box */
+.bill .wd {
+  display: grid;
+  grid-template-columns: 34% 66%;
+  border: 1px solid #000;
+  margin-top: -1px;
+}
+
+.bill .wd div {
+  padding: 1mm;
+  min-height: 7mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 7pt;
+}
+
+.bill .wd div:first-child {
+  justify-content: flex-start;
+  border-right: 1px solid #000;
+  font-size: 7.5pt;
+}
+
+/* bank details */
+.bill .bk {
+  margin-top: 4mm;
+  border-top: 1px solid #aaa;
+  padding-top: 2mm;
+}
+
+/* footer: terms on the left, signature on the right */
+.bill .ft {
+  position: absolute;
+  left: 4mm;
+  right: 4mm;
+  bottom: 5mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.bill .ft .s {
+  text-align: right;
+}
+
+
+/* ---------------------------------------------------------------------
+   10. GST TAX INVOICE SHEET (198mm x 284mm, A4 portrait)
+   Every rule starts with ".bill.g" so it only affects the tax invoice
+   --------------------------------------------------------------------- */
+.bill.g {
+  width: 198mm;
+  height: 284mm;
+  padding: 0;
+  font-size: 7.5pt;
+  line-height: 1.3;
+}
+
+/* ----- header: firm name and contact details ----- */
+.bill.g .hd {
+  display: flex;
+  justify-content: space-between;
+  gap: 4mm;
+  padding: 3mm 4mm 2mm;
+}
+
+.bill.g .fn {
+  font-size: 19pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bill.g .tag {
+  font-weight: 700;
+  font-size: 9pt;
+  margin: 1mm 0 2mm;
+}
+
+.bill.g .hd .rt {
+  text-align: right;
+  padding-top: 2mm;
+}
+
+/* ----- title row: PAN | TAX INVOICE | copy label ----- */
+.bill.g .tt {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 1.5mm 3mm;
+  font-size: 8pt;
+}
+
+.bill.g .tt .t {
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.bill.g .tt .orc {
+  text-align: right;
+  font-size: 6.5pt;
+}
+
+/* ----- customer box (left) and invoice box (right) ----- */
+.bill.g .cb2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .cb2 > div {
+  padding: 0 0 1mm;
+}
+
+.bill.g .cb2 > div:first-child {
+  border-right: 1px solid #000;
+}
+
+/* box heading ("Customer Detail") */
+.bill.g .ch {
+  text-align: center;
+  font-weight: 700;
+  border-bottom: 1px solid #000;
+  padding: 0.5mm;
+  margin-bottom: 1mm;
+}
+
+/* "kv" = one line: label on the left, value on the right */
+.bill.g .kv {
+  display: grid;
+  grid-template-columns: 26mm 1fr;
+  padding: 0.4mm 2mm;
+  min-height: 4.2mm;
+}
+
+.bill.g .iv {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+}
+
+.bill.g .iv > div:last-child .kv {
+  grid-template-columns: 19mm 1fr;
+}
+
+/* ----- tables (items and HSN summary) ----- */
+.bill.g table {
+  margin-top: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.bill.g td,
+.bill.g th {
+  border: 0;
+  border-left: 1px solid #000;
+  height: 4.6mm;
+  padding: 0 1.2mm;
+  font-size: 7.3pt;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* no left border on the first column of each table */
+.bill.g .it td:first-child,
+.bill.g .it th:first-child,
+.bill.g .hs tr:first-child > th:first-child,
+.bill.g .hs tr:nth-child(n+3) > td:first-child {
+  border-left: 0;
+}
+
+.bill.g .it {
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .hs {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .it + .w,
+.bill.g .hs + .w {
+  border-top: 0;
+}
+
+.bill.g th {
+  height: 5.5mm;
+  text-align: center;
+  white-space: normal;
+  border-top: 0;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .it th {
+  border-top: 1px solid #000;
+}
+
+/* rows with a line above (taxable total, TOTAL) */
+.bill.g tr.ts td {
+  border-top: 1px solid #000;
+}
+
+/* text alignment helpers: left, right, centre */
+.bill.g .tl { text-align: left; }
+.bill.g .tr { text-align: right; }
+.bill.g .c  { text-align: center; }
+
+/* ----- "Total in words" boxes ----- */
+.bill.g .w {
+  border-top: 1px solid #000;
+  padding: 1.5mm 2mm;
+}
+
+.bill.g .ww {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5mm;
+}
+
+/* ----- footer block pinned to the bottom of the page ----- */
+.bill.g .ftg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* grey-less section headings ("Bank Details", "Terms and Conditions") */
+.bill.g .gh {
+  text-align: center;
+  font-weight: 700;
+  padding: 0.7mm;
+  border-bottom: 1px solid #000;
+  font-size: 7.5pt;
+}
+
+/* bank details (left) and signature (right) */
+.bill.g .bk2 {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  border-top: 1px solid #000;
+}
+
+.bill.g .bnk {
+  border-right: 1px solid #000;
+}
+
+.bill.g .bkw {
+  display: flex;
+}
+
+.bill.g .bkl {
+  flex: 1;
+}
+
+.bill.g .kb {
+  display: grid;
+  grid-template-columns: 22mm 1fr;
+  padding: 0.8mm 2mm;
+}
+
+/* UPI QR code */
+.bill.g .qrb {
+  width: 32mm;
+  text-align: center;
+  padding: 1mm;
+  font-size: 7pt;
+}
+
+.bill.g .qrb svg {
+  width: 24mm;
+  height: 24mm;
+  display: block;
+  margin: 0 auto 1mm;
+}
+
+/* signature area */
+.bill.g .sgn {
+  display: flex;
+  flex-direction: column;
+}
+
+.bill.g .cert {
+  font-size: 6pt;
+  text-align: center;
+  padding: 1mm 2mm;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .fo {
+  text-align: center;
+  font-weight: 700;
+  padding: 0.7mm;
+  border-bottom: 1px solid #000;
+}
+
+/* empty space where the owner signs */
+.bill.g .sp {
+  flex: 1;
+  min-height: 14mm;
+}
+
+.bill.g .as {
+  border-top: 1px solid #000;
+  text-align: center;
+  font-size: 6.5pt;
+  padding: 0.7mm;
+}
+
+/* terms, customer signature, thank-you line */
+.bill.g .tcx {
+  padding: 1.2mm 2mm;
+}
+
+.bill.g .csg {
+  border-top: 1px solid #000;
+  padding: 5mm 2mm 1mm;
+}
+
+.bill.g .thx {
+  padding: 1.2mm 2mm;
+  font-size: 7pt;
+}
+
+
+/* ---------------------------------------------------------------------
+   11. PRINT RULES - hide the form, print only the bills
+   --------------------------------------------------------------------- */
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+
+  #app,
+  #toast {
+    display: none !important;
+  }
+
+  #printArea {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4mm;
+  }
+
+  #printArea .bill {
+    zoom: 1 !important;
+    break-inside: avoid;
+  }
+}/* =====================================================================
+   BLYNKnBILL - style.css
+   1.  Colours (theme variables)
+   2.  Page basics and layout
+   3.  Text, form controls and buttons
+   4.  Item rows
+   5.  Saved bills list
+   6.  Dropdown suggestions and toast message
+   7.  Small helper classes
+   8.  Live preview panel
+   9.  Bill of Supply sheet
+   10. GST Tax Invoice sheet
+   11. Print rules
+   ===================================================================== */
+
+
+/* ---------------------------------------------------------------------
+   1. COLOURS - change these to re-skin the whole app
+   --------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  box-sizing: border-box;
+
+  /* keeps content clear of phone notches and system bars */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  --bg:  #eef0ee;   /* page background        */
+  --card: #ffffff;  /* card background        */
+  --tx:  #17201b;   /* main text              */
+  --mut: #5d6a62;   /* grey helper text       */
+  --bd:  #cfd6d1;   /* borders                */
+  --ac:  #0f5c3a;   /* accent (green buttons) */
+  --act: #ffffff;   /* text on accent colour  */
+}
+
+
+/* ---------------------------------------------------------------------
+   2. PAGE BASICS AND LAYOUT
+   --------------------------------------------------------------------- */
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Mobile first: one column (form on top, bill below) */
+#app {
+  display: grid;
+  grid-template-columns: minmax(320px, 430px) 1fr;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  #app {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+}
+
+/* Desktop: two equal halves, form on the left, bill on the right */
+@media (min-width: 861px) {
+  #app {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    max-width: none;
+    margin: 0;
+    align-items: start;
+  }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+
+/* ---------------------------------------------------------------------
+   3. TEXT, FORM CONTROLS AND BUTTONS
+   --------------------------------------------------------------------- */
+h1 {
+  font-size: 19px;
+  margin: 0 0 10px;
+}
+
+h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--mut);
+  margin-bottom: 3px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--tx);
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: 7px;
+  padding: 8px;
+}
+
+/* visible outline when a field or button is selected with the keyboard */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid var(--ac);
+  outline-offset: 1px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  border-radius: 7px;
+  padding: 8px 12px;
+}
+
+/* "p" = primary button (green) */
+button.p {
+  background: var(--ac);
+  color: var(--act);
+  border-color: var(--ac);
+  font-weight: 600;
+}
+
+/* two fields side by side */
+.g2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* one form field (label + input) */
+.f {
+  margin-bottom: 10px;
+}
+
+/* a row of buttons that wraps on small screens */
+.btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* small grey helper text */
+.pg {
+  font-size: 12px;
+  color: var(--mut);
+  padding: 4px 0;
+}
+
+/* big total at the bottom of the items card */
+.tot {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+
+/* ---------------------------------------------------------------------
+   4. ITEM ROWS (one block per product)
+   --------------------------------------------------------------------- */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 8px;
+  border-top: 1px solid var(--bd);
+  padding: 10px 0;
+}
+
+/* first line of a row: number, product name, remove button */
+.row .top {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.row .top .dd {
+  flex: 1;
+  min-width: 0;
+}
+
+.row .no {
+  flex: none;
+  width: 22px;
+  color: var(--mut);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.row .x {
+  flex: none;
+  width: 38px;
+  padding: 7px 0;
+  line-height: 1;
+  font-size: 18px;
+}
+
+.row label {
+  margin-bottom: 2px;
+}
+
+/* last line of a row: "Save product" button on the left, amount on the right */
+.row .ab {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.row .sp2 {
+  flex: none;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ac);
+  border-color: var(--ac);
+}
+
+.row .amt {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* small round buttons used for custom units */
+.chip {
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  font-size: 12px;
+}
+
+/* saved product "pills" with a delete button inside */
+.pchip {
+  display: inline-flex;
+  margin: 2px 4px 2px 0;
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.pchip button {
+  border: 0;
+  border-radius: 0;
+  padding: 3px 9px;
+  font-size: 12px;
+}
+
+
+/* ---------------------------------------------------------------------
+   5. SAVED BILLS LIST
+   --------------------------------------------------------------------- */
+.bl {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.bi {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--bd);
+  padding: 8px 2px;
+  cursor: pointer;
+}
+
+.bi:hover {
+  background: var(--bg);
+}
+
+.bo {
+  flex: 1;
+  min-width: 0;
+}
+
+.bo small {
+  display: block;
+  color: var(--mut);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bd {
+  flex: none;
+  padding: 4px 10px;
+}
+
+
+/* ---------------------------------------------------------------------
+   6. DROPDOWN SUGGESTIONS AND TOAST MESSAGE
+   --------------------------------------------------------------------- */
+
+/* wrapper that lets the dropdown sit just under its input */
+.dd {
+  position: relative;
+}
+
+.dl {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.dl[hidden] {
+  display: none;
+}
+
+.dl div {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bd);
+}
+
+.dl div:last-child {
+  border-bottom: 0;
+}
+
+.dl div:hover {
+  background: var(--bg);
+}
+
+.dl small {
+  display: block;
+  color: var(--mut);
+}
+
+/* "No saved ..." message */
+.dl .em {
+  color: var(--mut);
+  cursor: default;
+}
+
+/* dropdown line with a delete (x) button on the right */
+.dl .ri {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dl .ri > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.dl .dx {
+  flex: none;
+  padding: 2px 9px;
+  font-size: 13px;
+}
+
+/* pop-up message at the bottom of the screen */
+#toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ac);
+  color: var(--act);
+  padding: 8px 14px;
+  border-radius: 8px;
+  z-index: 20;
+  font-size: 14px;
+}
+
+#toast[hidden] {
+  display: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   7. SMALL HELPER CLASSES (used instead of inline styles in the HTML)
+   --------------------------------------------------------------------- */
+.mt-8  { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-14 { margin-top: 14px; }
+.mb-10 { margin-bottom: 10px; }
+
+.full-width {
+  width: 100%;
+}
+
+/* red warning text under the company box */
+.error-note {
+  color: #d9534f;
+  font-weight: 600;
+}
+
+/* tick box with its text on one line */
+.check-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--tx);
+  margin-bottom: 10px;
+}
+
+.check-label input {
+  width: auto;
+}
+
+/* "Add your own unit" text box next to its button */
+.unit-input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+/* gap between the "copies to print" tick boxes */
+#cps {
+  gap: 6px 14px;
+}
+
+/* GST-only fields are hidden when the company uses Bill of Supply */
+.nogst .gstf {
+  display: none !important;
+}
+
+
+/* ---------------------------------------------------------------------
+   8. LIVE PREVIEW PANEL
+   --------------------------------------------------------------------- */
+#preview {
+  min-width: 0;
+}
+
+/* on desktop the preview stays in view while the form scrolls */
+@media (min-width: 861px) {
+  #preview {
+    position: sticky;
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+  }
+}
+
+#sheets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* only used while printing */
+#printArea {
+  display: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   9. BILL OF SUPPLY SHEET (140mm x 196mm, always black text on white)
+   --------------------------------------------------------------------- */
+.bill {
+  width: 140mm;
+  height: 196mm;
+  background: #fff;
+  color: #000;
+  border: 1px solid #444;
+  padding: 3mm 4mm;
+  font: 8pt/1.35 Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow: hidden;
+  flex: none;
+}
+
+/* "t" = a line with text at the left and right ends */
+.bill .t {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bill .c {
+  text-align: center;
+}
+
+.bill .nmx {
+  font-size: 16pt;
+  margin: 1mm 0;
+  text-align: center;
+}
+
+.bill .sm {
+  font-size: 7pt;
+}
+
+/* items table */
+.bill table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 3mm;
+}
+
+.bill td,
+.bill th {
+  border: 0;
+  border-left: 1px solid #000;
+  padding: 0 1mm;
+  height: 4.9mm;
+  text-align: center;
+  font-size: 7.5pt;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.bill td:first-child,
+.bill th:first-child {
+  border-left: 0;
+}
+
+.bill th {
+  font-weight: 700;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.bill td.l {
+  text-align: left;
+}
+
+/* the TOTAL row */
+.bill td.r {
+  text-align: right;
+  font-weight: 700;
+  border-top: 1px solid #000;
+}
+
+/* "Total amount (in words)" box */
+.bill .wd {
+  display: grid;
+  grid-template-columns: 34% 66%;
+  border: 1px solid #000;
+  margin-top: -1px;
+}
+
+.bill .wd div {
+  padding: 1mm;
+  min-height: 7mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 7pt;
+}
+
+.bill .wd div:first-child {
+  justify-content: flex-start;
+  border-right: 1px solid #000;
+  font-size: 7.5pt;
+}
+
+/* bank details */
+.bill .bk {
+  margin-top: 4mm;
+  border-top: 1px solid #aaa;
+  padding-top: 2mm;
+}
+
+/* footer: terms on the left, signature on the right */
+.bill .ft {
+  position: absolute;
+  left: 4mm;
+  right: 4mm;
+  bottom: 5mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.bill .ft .s {
+  text-align: right;
+}
+
+
+/* ---------------------------------------------------------------------
+   10. GST TAX INVOICE SHEET (198mm x 284mm, A4 portrait)
+   Every rule starts with ".bill.g" so it only affects the tax invoice
+   --------------------------------------------------------------------- */
+.bill.g {
+  width: 198mm;
+  height: 284mm;
+  padding: 0;
+  font-size: 7.5pt;
+  line-height: 1.3;
+}
+
+/* ----- header: firm name and contact details ----- */
+.bill.g .hd {
+  display: flex;
+  justify-content: space-between;
+  gap: 4mm;
+  padding: 3mm 4mm 2mm;
+}
+
+.bill.g .fn {
+  font-size: 19pt;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bill.g .tag {
+  font-weight: 700;
+  font-size: 9pt;
+  margin: 1mm 0 2mm;
+}
+
+.bill.g .hd .rt {
+  text-align: right;
+  padding-top: 2mm;
+}
+
+/* ----- title row: PAN | TAX INVOICE | copy label ----- */
+.bill.g .tt {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 1.5mm 3mm;
+  font-size: 8pt;
+}
+
+.bill.g .tt .t {
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.bill.g .tt .orc {
+  text-align: right;
+  font-size: 6.5pt;
+}
+
+/* ----- customer box (left) and invoice box (right) ----- */
+.bill.g .cb2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .cb2 > div {
+  padding: 0 0 1mm;
+}
+
+.bill.g .cb2 > div:first-child {
+  border-right: 1px solid #000;
+}
+
+/* box heading ("Customer Detail") */
+.bill.g .ch {
+  text-align: center;
+  font-weight: 700;
+  border-bottom: 1px solid #000;
+  padding: 0.5mm;
+  margin-bottom: 1mm;
+}
+
+/* "kv" = one line: label on the left, value on the right */
+.bill.g .kv {
+  display: grid;
+  grid-template-columns: 26mm 1fr;
+  padding: 0.4mm 2mm;
+  min-height: 4.2mm;
+}
+
+.bill.g .iv {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+}
+
+.bill.g .iv > div:last-child .kv {
+  grid-template-columns: 19mm 1fr;
+}
+
+/* ----- tables (items and HSN summary) ----- */
+.bill.g table {
+  margin-top: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.bill.g td,
+.bill.g th {
+  border: 0;
+  border-left: 1px solid #000;
+  height: 4.6mm;
+  padding: 0 1.2mm;
+  font-size: 7.3pt;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* no left border on the first column of each table */
+.bill.g .it td:first-child,
+.bill.g .it th:first-child,
+.bill.g .hs tr:first-child > th:first-child,
+.bill.g .hs tr:nth-child(n+3) > td:first-child {
+  border-left: 0;
+}
+
+.bill.g .it {
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .hs {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .it + .w,
+.bill.g .hs + .w {
+  border-top: 0;
+}
+
+.bill.g th {
+  height: 5.5mm;
+  text-align: center;
+  white-space: normal;
+  border-top: 0;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .it th {
+  border-top: 1px solid #000;
+}
+
+/* rows with a line above (taxable total, TOTAL) */
+.bill.g tr.ts td {
+  border-top: 1px solid #000;
+}
+
+/* text alignment helpers: left, right, centre */
+.bill.g .tl { text-align: left; }
+.bill.g .tr { text-align: right; }
+.bill.g .c  { text-align: center; }
+
+/* ----- "Total in words" boxes ----- */
+.bill.g .w {
+  border-top: 1px solid #000;
+  padding: 1.5mm 2mm;
+}
+
+.bill.g .ww {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5mm;
+}
+
+/* ----- footer block pinned to the bottom of the page ----- */
+.bill.g .ftg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* grey-less section headings ("Bank Details", "Terms and Conditions") */
+.bill.g .gh {
+  text-align: center;
+  font-weight: 700;
+  padding: 0.7mm;
+  border-bottom: 1px solid #000;
+  font-size: 7.5pt;
+}
+
+/* bank details (left) and signature (right) */
+.bill.g .bk2 {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  border-top: 1px solid #000;
+}
+
+.bill.g .bnk {
+  border-right: 1px solid #000;
+}
+
+.bill.g .bkw {
+  display: flex;
+}
+
+.bill.g .bkl {
+  flex: 1;
+}
+
+.bill.g .kb {
+  display: grid;
+  grid-template-columns: 22mm 1fr;
+  padding: 0.8mm 2mm;
+}
+
+/* UPI QR code */
+.bill.g .qrb {
+  width: 32mm;
+  text-align: center;
+  padding: 1mm;
+  font-size: 7pt;
+}
+
+.bill.g .qrb svg {
+  width: 24mm;
+  height: 24mm;
+  display: block;
+  margin: 0 auto 1mm;
+}
+
+/* signature area */
+.bill.g .sgn {
+  display: flex;
+  flex-direction: column;
+}
+
+.bill.g .cert {
+  font-size: 6pt;
+  text-align: center;
+  padding: 1mm 2mm;
+  border-bottom: 1px solid #000;
+}
+
+.bill.g .fo {
+  text-align: center;
+  font-weight: 700;
+  padding: 0.7mm;
+  border-bottom: 1px solid #000;
+}
+
+/* empty space where the owner signs */
+.bill.g .sp {
+  flex: 1;
+  min-height: 14mm;
+}
+
+.bill.g .as {
+  border-top: 1px solid #000;
+  text-align: center;
+  font-size: 6.5pt;
+  padding: 0.7mm;
+}
+
+/* terms, customer signature, thank-you line */
+.bill.g .tcx {
+  padding: 1.2mm 2mm;
+}
+
+.bill.g .csg {
+  border-top: 1px solid #000;
+  padding: 5mm 2mm 1mm;
+}
+
+.bill.g .thx {
+  padding: 1.2mm 2mm;
+  font-size: 7pt;
+}
+
+
+/* ---------------------------------------------------------------------
+   11. PRINT RULES - hide the form, print only the bills
+   --------------------------------------------------------------------- */
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+
+  #app,
+  #toast {
+    display: none !important;
+  }
+
+  #printArea {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4mm;
+  }
+
+  #printArea .bill {
+    zoom: 1 !important;
+    break-inside: avoid;
+  }
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>BLYNKnBILL</title>
+
+  <!-- Libraries loaded from the internet: PDF download and the UPI QR code -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+  <!-- Our own stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- script.js writes the paper size (@page) here just before printing -->
+  <style id="pgstyle"></style>
+</head>
+
+<body>
+
+  <!-- Two-column layout: LEFT = form, RIGHT = live bill preview -->
+  <div id="app">
+
+    <!-- ================= LEFT COLUMN: the form ================= -->
+    <div id="form">
+
+      <!-- CARD 1: choose, add, edit or delete a company -->
+      <div class="card" id="cocard">
+        <label for="cosel">Company (this bill is made for)</label>
+        <select id="cosel"></select>
+
+        <div class="btns mt-8">
+          <button id="coadd">+ Add company</button>
+          <button id="coedit">Edit</button>
+          <button id="codel">Delete</button>
+        </div>
+
+        <div class="pg error-note" id="conote"></div>
+
+        <!-- Company details form (hidden until Add or Edit is pressed) -->
+        <div id="coform" hidden>
+          <h2 class="mt-14">Company details</h2>
+
+          <!-- script.js fills this grid with the company fields -->
+          <div class="g2" id="cofields"></div>
+
+          <div class="mb-10">
+            <label for="f_bt">Bill type for this company</label>
+            <select id="f_bt">
+              <option value="sup">Bill of Supply (composition, no GST)</option>
+              <option value="gst">Tax Invoice (regular GST)</option>
+            </select>
+          </div>
+
+          <div class="btns">
+            <button class="p" id="cosave">Save company</button>
+            <button id="cocancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: bill details (serial number, date, customer) -->
+      <div class="card">
+        <h1 id="ttl">Bill of Supply</h1>
+        <div class="pg" id="ed"></div>
+
+        <div class="g2">
+          <div>
+            <label for="sno">Serial number</label>
+            <input id="sno" type="number" inputmode="numeric" min="1">
+          </div>
+          <div>
+            <label for="date">Date</label>
+            <input id="date" type="date">
+          </div>
+        </div>
+
+        <!-- Customer name box with a dropdown of saved customers -->
+        <div class="f">
+          <label for="cname">Customer name</label>
+          <div class="dd">
+            <input id="cname" autocomplete="off" placeholder="Tap to pick a saved customer, or type a new one">
+            <div class="dl" id="cl" hidden></div>
+          </div>
+        </div>
+
+        <div class="f">
+          <label for="cadr">Address</label>
+          <input id="cadr" placeholder="Address">
+        </div>
+
+        <div class="f">
+          <label for="cgst">Customer GSTIN/UIN (optional)</label>
+          <input id="cgst">
+        </div>
+
+        <!-- Fields below are shown only for a GST Tax Invoice (class "gstf") -->
+        <div id="xf" class="gstf"></div>
+
+        <div class="f gstf">
+          <label for="cstate">Place of supply (customer state)</label>
+          <select id="cstate"></select>
+        </div>
+
+        <label class="check-label gstf">
+          <input type="checkbox" id="incl">
+          Prices already include GST
+        </label>
+
+        <div class="btns">
+          <button id="savec">Save customer</button>
+          <button id="delc">Delete saved</button>
+        </div>
+      </div>
+
+      <!-- CARD 3: items on the bill -->
+      <div class="card">
+        <h2>Items</h2>
+
+        <!-- script.js adds one row per item here -->
+        <div id="rows"></div>
+
+        <div class="btns mt-8">
+          <button id="add">+ Add item</button>
+        </div>
+
+        <!-- Saved products of the selected company -->
+        <div class="f mt-12">
+          <label>Saved products (tap one to add it to the bill)</label>
+          <div id="plist" class="pg"></div>
+        </div>
+
+        <!-- Add your own unit such as Dozen, Box or Packet -->
+        <div class="f mt-12">
+          <label for="nu">Add your own unit (e.g. Dozen, Box, Packet)</label>
+          <div class="btns">
+            <input id="nu" class="unit-input" maxlength="12">
+            <button id="addu">Add unit</button>
+          </div>
+          <div class="pg" id="chips"></div>
+        </div>
+
+        <div class="pg" id="info"></div>
+        <div class="tot" id="gt"></div>
+        <div class="pg">Tip: for Freight, type the name and put the amount in Price, leave Qty empty.</div>
+      </div>
+
+      <!-- CARD 4: print copies and action buttons -->
+      <div class="card">
+        <div class="f">
+          <label>Copies to print (tick the types you need)</label>
+          <div class="btns" id="cps"></div>
+          <div class="pg" id="cpi"></div>
+        </div>
+
+        <div class="f">
+          <button class="p full-width" id="print">Print</button>
+        </div>
+
+        <div class="btns">
+          <button class="p" id="sv">Save bill</button>
+          <button id="pdf">Download as PDF</button>
+          <button class="p" id="share">Share PDF</button>
+          <button id="next">New bill (next serial)</button>
+        </div>
+      </div>
+
+      <!-- CARD 5: saved bills of the selected company -->
+      <div class="card">
+        <h2>Saved bills <span id="bc" class="pg"></span></h2>
+        <div id="bl" class="bl"></div>
+      </div>
+
+    </div>
+    <!-- ================= end of LEFT COLUMN ================= -->
+
+
+    <!-- ================= RIGHT COLUMN: live preview ================= -->
+    <div id="preview">
+      <div id="sheets"></div>
+    </div>
+
+  </div>
+
+  <!-- Hidden area: script.js copies the bills here only while printing -->
+  <div id="printArea"></div>
+
+  <!-- Suggested GST rates for the "GST %" box -->
+  <datalist id="rates">
+    <option value="0">
+    <option value="0.25">
+    <option value="3">
+    <option value="5">
+    <option value="12">
+    <option value="18">
+    <option value="28">
+    <option value="40">
+  </datalist>
+
+  <!-- Small pop-up message at the bottom of the screen -->
+  <div id="toast" hidden></div>
+
+  <!-- All the logic. Loaded last so every element above already exists -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
